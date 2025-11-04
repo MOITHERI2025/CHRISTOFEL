@@ -1,0 +1,242 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useCart } from '../context/CartContext';
+
+const menuItems = [
+  {
+    id: 1,
+    name: 'Mediterranean Salad',
+    price: 120,
+    description: 'Fresh greens with olives, feta, and a lemon-herb vinaigrette',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    dietary: 'Vegetarian, Gluten-Free',
+    allergens: 'Dairy (feta cheese)'
+  },
+  {
+    id: 2,
+    name: 'Truffle Risotto',
+    price: 280,
+    description: 'Creamy arborio rice with wild mushrooms and black truffle',
+    image: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    dietary: 'Vegetarian (can be made vegan on request)',
+    allergens: 'Dairy (Parmesan cheese)'
+  },
+  {
+    id: 3,
+    name: 'Herb-Crusted Salmon',
+    price: 320,
+    description: 'Atlantic salmon with a fresh herb crust and lemon butter sauce',
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    dietary: 'Pescatarian, Gluten-Free option available',
+    allergens: 'Fish, Dairy (butter), Gluten (breadcrumbs)'
+  },
+  {
+    id: 4,
+    name: 'Beef Wellington',
+    price: 450,
+    description: 'Prime beef tenderloin wrapped in puff pastry with mushroom duxelles',
+    image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    dietary: 'Contains meat, dairy, and gluten',
+    allergens: 'Gluten (pastry), Dairy (butter in duxelles)'
+  },
+  {
+    id: 5,
+    name: 'Chocolate Soufflé',
+    price: 150,
+    description: 'Decadent dark chocolate soufflé with vanilla bean ice cream',
+    image: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+    dietary: 'Vegetarian',
+    allergens: 'Dairy, Eggs, Gluten'
+  }
+];
+
+const MenuScreen = ({ navigation }) => {
+  const { cart, addToCart, getTotalPrice } = useCart();
+
+  return (
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.subtitle}>
+          Select your dishes for an unforgettable culinary experience
+        </Text>
+
+        {menuItems.map(item => (
+          <View key={item.id} style={styles.menuItem}>
+            <Image source={{ uri: item.image }} style={styles.itemImage} />
+            <View style={styles.itemContent}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <Text style={styles.itemPrice}>R {item.price}</Text>
+              <Text style={styles.itemDescription}>{item.description}</Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => addToCart(item)}
+              >
+                <Ionicons name="cart" size={20} color="white" />
+                <Text style={styles.addButtonText}>Add to Cart</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      {cart.length > 0 && (
+        <View style={styles.cartSummary}>
+          <Text style={styles.cartTitle}>Your Selection</Text>
+          {cart.map(item => (
+            <Text key={item.id} style={styles.cartItem}>
+              {item.name} x{item.quantity} - R {item.price * item.quantity}
+            </Text>
+          ))}
+          <Text style={styles.cartTotal}>Total: R {getTotalPrice()}</Text>
+          
+          <View style={styles.navigationButtons}>
+            <TouchableOpacity
+              style={[styles.navButton, styles.backButton]}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={20} color="white" />
+              <Text style={styles.navButtonText}>Back to Home</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => navigation.navigate('Description')}
+            >
+              <Text style={styles.navButtonText}>Continue to Details</Text>
+              <Ionicons name="arrow-forward" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  scrollView: {
+    flex: 1,
+    padding: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  menuItem: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  itemImage: {
+    width: '100%',
+    height: 200,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  itemContent: {
+    padding: 15,
+  },
+  itemName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 5,
+  },
+  itemPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#e67e22',
+    marginBottom: 10,
+  },
+  itemDescription: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 15,
+    lineHeight: 20,
+  },
+  addButton: {
+    backgroundColor: '#27ae60',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  cartSummary: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  cartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#2c3e50',
+  },
+  cartItem: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 5,
+  },
+  cartTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  navigationButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  navButton: {
+    backgroundColor: '#e67e22',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+  },
+  backButton: {
+    backgroundColor: '#7f8c8d',
+  },
+  navButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginHorizontal: 5,
+  },
+});
+
+export default MenuScreen;
