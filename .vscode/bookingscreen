@@ -1,0 +1,319 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useCart } from '../context/CartContext';
+
+const BookingScreen = ({ navigation }) => {
+  const { cart, clearCart, getTotalPrice } = useCart();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    date: '',
+    time: '',
+    guests: '',
+    tip: '',
+    specialRequests: '',
+  });
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    // Basic validation
+    if (!formData.firstName || !formData.lastName || !formData.email || 
+        !formData.phone || !formData.address || !formData.date || 
+        !formData.time || !formData.guests) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    Alert.alert(
+      'Booking Confirmed!',
+      'Thank you for your booking! Christofel will contact you shortly to confirm your private dining experience.',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            clearCart();
+            navigation.navigate('Welcome');
+          },
+        },
+      ]
+    );
+  };
+
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.subtitle}>
+          Please provide your details to finalize your private dining experience
+        </Text>
+
+        <View style={styles.form}>
+          <View style={styles.row}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>First Name *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.firstName}
+                onChangeText={(text) => handleInputChange('firstName', text)}
+                placeholder="Enter your first name"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Last Name *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.lastName}
+                onChangeText={(text) => handleInputChange('lastName', text)}
+                placeholder="Enter your last name"
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email Address *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.email}
+              onChangeText={(text) => handleInputChange('email', text)}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Phone Number *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.phone}
+              onChangeText={(text) => handleInputChange('phone', text)}
+              placeholder="Enter your phone number"
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Full Address *</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.address}
+              onChangeText={(text) => handleInputChange('address', text)}
+              placeholder="Enter your full address"
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Date *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.date}
+                onChangeText={(text) => handleInputChange('date', text)}
+                placeholder="YYYY-MM-DD"
+                min={getTomorrowDate()}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Time *</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.time}
+                onChangeText={(text) => handleInputChange('time', text)}
+                placeholder="HH:MM"
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Number of Guests *</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.guests}
+              onChangeText={(text) => handleInputChange('guests', text)}
+              placeholder="Select number of guests"
+              keyboardType="numeric"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Tip Amount (R)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.tip}
+              onChangeText={(text) => handleInputChange('tip', text)}
+              placeholder="Optional"
+              keyboardType="numeric"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Special Requests</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.specialRequests}
+              onChangeText={(text) => handleInputChange('specialRequests', text)}
+              placeholder="Any allergies, dietary restrictions, or special requests"
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+        </View>
+
+        {cart.length > 0 && (
+          <View style={styles.orderSummary}>
+            <Text style={styles.summaryTitle}>Order Summary</Text>
+            {cart.map(item => (
+              <Text key={item.id} style={styles.summaryItem}>
+                {item.name} x{item.quantity} - R {item.price * item.quantity}
+              </Text>
+            ))}
+            <Text style={styles.summaryTotal}>Total: R {getTotalPrice()}</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity
+          style={[styles.navButton, styles.backButton]}
+          onPress={() => navigation.navigate('Description')}
+        >
+          <Ionicons name="arrow-back" size={20} color="white" />
+          <Text style={styles.navButtonText}>Back</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={handleSubmit}
+        >
+          <Ionicons name="checkmark-circle" size={20} color="white" />
+          <Text style={styles.navButtonText}>Complete Booking</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  scrollView: {
+    flex: 1,
+    padding: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  form: {
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  inputGroup: {
+    flex: 1,
+    marginBottom: 15,
+    marginHorizontal: 5,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 5,
+  },
+  input: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 12,
+    fontSize: 16,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  orderSummary: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 10,
+  },
+  summaryItem: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 5,
+  },
+  summaryTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginTop: 10,
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  navButton: {
+    backgroundColor: '#e67e22',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+  },
+  backButton: {
+    backgroundColor: '#7f8c8d',
+  },
+  navButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginHorizontal: 5,
+  },
+});
+
+export default BookingScreen;

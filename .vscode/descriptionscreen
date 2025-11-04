@@ -1,0 +1,178 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useCart } from '../context/CartContext';
+
+const DescriptionScreen = ({ navigation }) => {
+  const { cart } = useCart();
+
+  if (cart.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.emptyText}>No items selected</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('Menu')}
+        >
+          <Text style={styles.buttonText}>Back to Menu</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.subtitle}>
+          Review your selected dishes and their dietary information
+        </Text>
+
+        {cart.map(item => (
+          <View key={item.id} style={styles.selectedItem}>
+            <Text style={styles.itemTitle}>
+              {item.name} <Text style={styles.quantity}>x{item.quantity}</Text>
+            </Text>
+            <Text style={styles.description}>
+              <Text style={styles.label}>Description:</Text> {item.description}
+            </Text>
+            <View style={styles.dietaryInfo}>
+              <Text style={styles.label}>Dietary Information:</Text>
+              <Text style={styles.dietaryText}>{item.dietary}</Text>
+            </View>
+            <View style={styles.dietaryInfo}>
+              <Text style={styles.label}>Allergens:</Text>
+              <Text style={styles.dietaryText}>{item.allergens}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity
+          style={[styles.navButton, styles.backButton]}
+          onPress={() => navigation.navigate('Menu')}
+        >
+          <Ionicons name="arrow-back" size={20} color="white" />
+          <Text style={styles.navButtonText}>Back to Menu</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={() => navigation.navigate('Booking')}
+        >
+          <Text style={styles.navButtonText}>Continue to Booking</Text>
+          <Ionicons name="arrow-forward" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  scrollView: {
+    flex: 1,
+    padding: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  selectedItem: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  itemTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 10,
+  },
+  quantity: {
+    color: '#e67e22',
+  },
+  description: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 15,
+    lineHeight: 20,
+  },
+  dietaryInfo: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#2c3e50',
+  },
+  dietaryText: {
+    color: '#7f8c8d',
+    marginTop: 5,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    marginTop: 50,
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#e67e22',
+    padding: 15,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  navButton: {
+    backgroundColor: '#e67e22',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+  },
+  backButton: {
+    backgroundColor: '#7f8c8d',
+  },
+  navButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginHorizontal: 5,
+  },
+});
+
+export default DescriptionScreen;
